@@ -21,7 +21,7 @@ public class Painting {
 	private String title;
 
 	@Column(nullable = false)
-	private String author;
+	private String artist;
 
 	@Column(nullable = false)
 	private int period;

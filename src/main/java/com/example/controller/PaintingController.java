@@ -22,6 +22,11 @@ public class PaintingController {
 	@Autowired
 	PaintingDaoService service;
 	
+	@GetMapping("/")
+    public String showHomePage() {
+        return "redirect:/paintings";
+    }
+	
 	@GetMapping("/paintings")
 	public String getPaintings(Model model) {
 	String s="List of available paintings: ";
@@ -72,4 +77,22 @@ public class PaintingController {
 	    redirectAttributes.addFlashAttribute("successMessage", "Painting '" + painting.getTitle() + "' was successfully updated!");
 	    return "redirect:/paintings";
 	}
+	
+	@PostMapping("/paintings/filter-advanced")
+	public String filterAdvanced(
+            @RequestParam(required = false) String artist,
+            @RequestParam(required = false) String period,
+            @RequestParam(required = false) String technique,
+            @RequestParam(required = false) String material,
+            Model model) {
+
+        List<Painting> result = service.filterAdvanced(artist, period, technique, material);
+        
+        model.addAttribute("listPaintings", result);
+        model.addAttribute("str", "Filtered results:"); 
+        
+        return "paintings";
+    }
+	
+	
 }

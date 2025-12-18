@@ -19,4 +19,6 @@ public class UserController {
 	model.addAttribute("listUsers",repository.findAll());
 	return "users";
 	}
+	
+	
 }
