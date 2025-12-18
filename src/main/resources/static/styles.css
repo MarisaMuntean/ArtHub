@@ -1,0 +1,16 @@
+.right-button {
+    text-align: right;     
+    margin-bottom: 3px;  
+}
+
+/*fixed bug: dropdown menu being cut by the table*/
+.table-responsive, 
+.table, 
+td, 
+th {
+    overflow: visible !important; 
+}
+
+tbody tr {
+    position: relative; 
+}

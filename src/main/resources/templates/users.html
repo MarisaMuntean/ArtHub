@@ -1,0 +1,27 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<header>
+<link href="https://bootswatch.com/5/sketchy/bootstrap.min.css"
+rel="stylesheet" integrity="sha384-
+1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<title>
+List of current users: 
+</title>
+</header>
+<body>
+<h3 th:text="${str}"/>
+<table class="table table-striped table-bordered">
+<tr>
+<th>Id</th>
+<th>Username</th>
+<th>Password</th>
+<th>Role</th>
+</tr>
+<tr th:each="c : ${listUsers}">
+<td th:text="${c.getId()}"></td>
+<td th:text="${c.getUsername()}"></td>
+<td th:text="${c.getPassword()}"></td>
+<td th:text="${c.getRole()}"></td>
+</tr>
+</table>
+</body>
+</html>
