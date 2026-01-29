@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -31,6 +33,11 @@ public class Painting {
 
 	@Column(nullable = false)
 	private String material;
+	
+	@Column(nullable = false)
+	private BigDecimal price;
 
+	@Column(length = 2000)
+	private String imageUrl;
 
 }

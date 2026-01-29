@@ -1,9 +1,15 @@
 package com.example.controller;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.entity.Painting;
@@ -28,10 +35,20 @@ public class PaintingController {
     }
 	
 	@GetMapping("/paintings")
-	public String getPaintings(Model model) {
-	String s="List of available paintings: ";
-	model.addAttribute("str",s);
-	model.addAttribute("listPaintings",service.findAllPaintings());
+	public String getPaintings(@RequestParam(defaultValue = "0") int page, Model model) {
+		int pageSize = 6;
+		Page<Painting> pageResult = service.findPaginated(page, pageSize);
+		
+		model.addAttribute("listPaintings", pageResult);
+		
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages",pageResult.getTotalPages());
+		model.addAttribute("totalItems",pageResult.getTotalElements());
+		model.addAttribute("str","List of available paintings: ");
+		
+		//add the slider data
+		addSliderDataToModel(model);
+
 	return "paintings";
 	}
 	
@@ -50,7 +67,32 @@ public class PaintingController {
 	}
 	
 	@PostMapping("/paintings/add")
-	public String savePainting(@ModelAttribute Painting painting, RedirectAttributes redirectAttributes) {
+	public String savePainting(@ModelAttribute Painting painting, 
+			@RequestParam("imageFile") MultipartFile imageFile,
+			RedirectAttributes redirectAttributes) {
+		
+		if(!imageFile.isEmpty())
+		{
+			try {
+				String uploadDirectory = System.getProperty("user.dir") + "/uploads";
+				String fileName = imageFile.getOriginalFilename();
+				
+				Path uploadPath = Paths.get(uploadDirectory);
+				if(!Files.exists(uploadPath))
+				{
+					Files.createDirectories(uploadPath);
+				}
+				
+				Path filePath = uploadPath.resolve(fileName);
+				Files.copy(imageFile.getInputStream(),filePath,StandardCopyOption.REPLACE_EXISTING);
+				painting.setImageUrl("/uploads/" + fileName);
+			}catch(IOException e)
+			{
+				e.printStackTrace();
+				redirectAttributes.addFlashAttribute("errorMessage","Error uploading image: " + e.getMessage());
+				return "redirect:/paintings";
+			}
+		}
 	service.savePainting(painting);
 	String mesaj = "You successfully added the painting named " + painting.getTitle();
 	redirectAttributes.addFlashAttribute("successMessage", mesaj);
@@ -78,21 +120,35 @@ public class PaintingController {
 	    return "redirect:/paintings";
 	}
 	
+	//access in the client to the extreme points
+	private void addSliderDataToModel(Model model) {
+        model.addAttribute("globalMinPrice", service.getMinPrice());
+        model.addAttribute("globalMaxPrice", service.getMaxPrice());
+    }
+	
+	
 	@PostMapping("/paintings/filter-advanced")
 	public String filterAdvanced(
             @RequestParam(required = false) String artist,
             @RequestParam(required = false) String period,
             @RequestParam(required = false) String technique,
             @RequestParam(required = false) String material,
+            @RequestParam(required = false) BigDecimal minPrice, 
+            @RequestParam(required = false) BigDecimal maxPrice,
             Model model) {
 
-        List<Painting> result = service.filterAdvanced(artist, period, technique, material);
-        
+		List<Painting> result = service.filterAdvanced(artist, period, technique, material, minPrice, maxPrice);
+		
         model.addAttribute("listPaintings", result);
-        model.addAttribute("str", "Filtered results:"); 
+        model.addAttribute("str", "Filtered results:");
+        
+        addSliderDataToModel(model);
+        
+        //new selected values for the price filter
+        model.addAttribute("selectedMinPrice", minPrice);
+        model.addAttribute("selectedMaxPrice", maxPrice);
         
         return "paintings";
     }
-	
 	
 }

@@ -1,10 +1,14 @@
 package com.example.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import com.example.entity.Painting;
@@ -36,17 +40,35 @@ public class PaintingDaoService {
 
 		return false;
 	}
+	
+	public BigDecimal getMinPrice() {
+        BigDecimal min = repository.findMinPrice();
+        return (min != null) ? min : new BigDecimal("0.0");
+    }
+	
+	public BigDecimal getMaxPrice() {
+        BigDecimal max = repository.findMaxPrice();
+        return (max != null) ? max : new BigDecimal("1000.0"); // default value
+    }
 
-	public List<Painting> filterAdvanced(String artist, String periodStr, String technique, String material) {
+	public List<Painting> filterAdvanced(String artist, String periodStr, String technique, String material, BigDecimal minPrice, BigDecimal maxPrice) {
 
 		List<Painting> allPaintings = repository.findAll();
 
-		return allPaintings.stream().filter(p -> matches(p.getArtist(), artist)) // Verificăm Artist
-				.filter(p -> matchesPeriod(p.getPeriod(), periodStr)) // Verificăm Anul
-				.filter(p -> matches(p.getTechnique(), technique)) // Verificăm Tehnica
-				.filter(p -> matches(p.getMaterial(), material)) // Verificăm Material
+		return allPaintings.stream().filter(p -> matches(p.getArtist(), artist)) 
+				.filter(p -> matchesPeriod(p.getPeriod(), periodStr)) 
+				.filter(p -> matches(p.getTechnique(), technique)) 
+				.filter(p -> matches(p.getMaterial(), material)) 
+				.filter(p -> matchesPrice(p.getPrice(), minPrice, maxPrice))
 				.collect(Collectors.toList());
 	}
+	
+	private boolean matchesPrice(BigDecimal paintPrice, BigDecimal min, BigDecimal max) {
+        if (paintPrice == null) return false;
+        boolean afterMin = (min == null) || (paintPrice.compareTo(min) >= 0);
+        boolean beforeMax = (max == null) || (paintPrice.compareTo(max) <= 0);
+        return afterMin && beforeMax;
+    }
 
 	private boolean matches(String dbValue, String filterValue) {
 		if (filterValue == null || filterValue.trim().isEmpty()) {
@@ -67,5 +89,11 @@ public class PaintingDaoService {
 		} catch (NumberFormatException e) {
 			return true;
 		}
+		
+	}
+	
+	public Page<Painting> findPaginated(int pageNo, int pageSize) {
+	    Pageable pageable = PageRequest.of(pageNo, pageSize);
+	    return repository.findAll(pageable);
 	}
 }

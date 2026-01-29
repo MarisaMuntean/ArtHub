@@ -19,10 +19,9 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
-		//.csrf(csrf -> csrf.disable())
 		.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/styles.css","/register","/register/save","/login").permitAll()
-				.requestMatchers("/paintings","/paintings/find","/paintings/filter-advanced").authenticated()
+				.requestMatchers("/register","/register/save","/login").permitAll()
+				.requestMatchers("/paintings","/paintings/find","/paintings/filter-advanced","/uploads/**","/styles.css","/checkout/**").authenticated()
 				.requestMatchers("/paintings/add","/paintings/delete/**","/paintings/update").hasRole("EDITOR")
 				.anyRequest().authenticated()
 				)

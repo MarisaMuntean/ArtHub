@@ -14,3 +14,30 @@ th {
 tbody tr {
     position: relative; 
 }
+
+/* Background for paintings.html */
+body.paintings-page {
+    min-height: 100vh; 
+    background: radial-gradient(125% 125% at 50% 90%, #fff 40%, #475569 100%);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+/* Background for checkout.html */
+body.checkout-page {
+    min-height: 100vh; 
+    background: radial-gradient(125% 125% at 50% 10%, #fff 40%, #475569 100%);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.checkout-page .btn-turquoise {
+    background-color: #00ced1;   
+    color: #fff;                 
+    border-color: #00ced1;       
+}
+
+.checkout-page h3.turquoise {
+    color: #00ced1;              
+}
+

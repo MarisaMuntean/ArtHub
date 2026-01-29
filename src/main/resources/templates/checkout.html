@@ -1,0 +1,100 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Checkout</title>
+<link href="https://bootswatch.com/5/sketchy/bootstrap.min.css"
+	rel="stylesheet">
+<link rel="stylesheet" th:href="@{/styles.css}" />
+</head>
+<body class="checkout-page">
+	<div class="container mt-5">
+		<div class="row">
+			<div class="col-md-5">
+				<h3 class="text-primary">Order Summary</h3>
+				<div class="card border-primary mb-3">
+					<div class="card-header" th:text="${painting.title}">Title</div>
+					<div class="card-body text-center">
+						<img th:if="${painting.imageUrl != null}"
+							th:src="${painting.imageUrl}"
+							style="max-width: 100%; height: 200px; object-fit: cover;"
+							class="mb-3">
+						<h5 class="card-title" th:text="'Artist: ' + ${painting.artist}"></h5>
+						<p class="card-text">
+							Price: <strong>$500</strong> (Example)
+						</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-7">
+				<h3 class="turquoise">Shipping & Payment</h3>
+
+				<div th:if="${cancelMessage}" class="alert alert-danger"
+					th:text="${cancelMessage}"></div>
+
+				<form th:action="@{/checkout/process}" method="post"
+					th:object="${order}">
+					<input type="hidden" name="paintingId" th:value="${painting.id}">
+
+					<div class="mb-3">
+						<label class="form-label">Delivery Address</label>
+						<textarea class="form-control" th:field="*{address}" required
+							rows="2" placeholder="Street, City, Zip..."></textarea>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label">Phone Number</label> <input type="text"
+							class="form-control" th:field="*{phoneNumber}" required
+							placeholder="07xx...">
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label fw-bold">Payment Method</label>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="paymentMethod"
+								id="payCash" value="CASH" checked
+								onclick="toggleCardInput(false)"> <label
+								class="form-check-label" for="payCash">Cash on Delivery
+							</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" name="paymentMethod"
+								id="payCard" value="CARD" onclick="toggleCardInput(true)">
+							<label class="form-check-label" for="payCard">Pay with
+								Card</label>
+						</div>
+					</div>
+
+					<div id="cardDetails" style="display: none;"
+						class="card p-3 mb-3 bg-light">
+						<h6>Card Details</h6>
+						<div class="mb-2">
+							<input type="text" class="form-control" name="cardNumber"
+								placeholder="Card Number (16 digits)">
+						</div>
+						<div class="row">
+							<div class="col">
+								<input type="text" class="form-control" placeholder="MM/YY">
+							</div>
+							<div class="col">
+								<input type="text" class="form-control" placeholder="CVV">
+							</div>
+						</div>
+					</div>
+
+					<button type="submit" class="btn btn-lg w-100 btn-turquoise">Place
+						Order</button>
+					<a th:href="@{/paintings}" class="btn btn-link w-100 mt-2">Cancel</a>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		function toggleCardInput(show) {
+			document.getElementById('cardDetails').style.display = show ? 'block'
+					: 'none';
+			document.querySelector('input[name="cardNumber"]').required = show;
+		}
+	</script>
+</body>
+</html>
