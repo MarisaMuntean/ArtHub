@@ -57,12 +57,12 @@ To prevent **overselling** (Race Conditions) on unique art pieces:
 
 ---
 
-## 📸 Module Visualization
+## Module Visualization
 
 ### Authentication & Validation
-<img width="975" height="1111" alt="image" src="https://github.com/user-attachments/assets/226cde16-757f-47ba-a6cc-cf79b0abcdc5" />
+<img width="800" height="800" alt="image" src="https://github.com/user-attachments/assets/226cde16-757f-47ba-a6cc-cf79b0abcdc5" />
 
-<img width="975" height="978" alt="image" src="https://github.com/user-attachments/assets/0d25bc48-2a99-45f7-957b-ad03a0a5d565" />
+<img width="800" height="800" alt="image" src="https://github.com/user-attachments/assets/0d25bc48-2a99-45f7-957b-ad03a0a5d565" />
 
 
 ### Inventory Management (Editor Role)
