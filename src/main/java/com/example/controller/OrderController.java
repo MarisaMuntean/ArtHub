@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,7 +40,10 @@ public class OrderController {
 	@Autowired
 	private StripeService stripeService;
 
-	 @GetMapping("/{paintingId}")
+	// private static final Logger logger =
+	// LoggerFactory.getLogger(OrderController.class);
+
+	@GetMapping("/{paintingId}")
 	public String showCheckoutPage(@PathVariable Long paintingId, Model model) {
 		Painting painting = paintingService.findById(paintingId);
 
@@ -64,10 +68,18 @@ public class OrderController {
 			return "redirect:/paintings";
 		}
 
+		boolean isSold = orderRepository.existsByPaintingAndStatusNot(painting, OrderStatus.CANCELED);
+
+		if (isSold) {
+			redirectAttributes.addFlashAttribute("errorMessage",
+					"Sorry this painting has been sold or another user is about to buy it!");
+			return "redirect:/paintings";
+		}
 		order.setUser(currentUser);
 		order.setPainting(painting);
 
 		orderRepository.save(order);
+
 		if (order.getPaymentMethod() == PaymentMethod.CARD) {
 			try {
 				BigDecimal price = painting.getPrice();
@@ -75,7 +87,7 @@ public class OrderController {
 				return "redirect:" + session.getUrl();
 			} catch (Exception e) {
 				e.printStackTrace();
-				redirectAttributes.addFlashAttribute("errorMessage", "Stripe error: " + e.getMessage());
+				redirectAttributes.addFlashAttribute("errorMessage", "Payment failed.");
 				return "redirect:/checkout/" + paintingId;
 			}
 		} else {
@@ -83,25 +95,23 @@ public class OrderController {
 			return "redirect:/paintings";
 		}
 	}
-	
+
 	@GetMapping("/success")
-	public String checkoutSuccess(@RequestParam("orderId") Long orderId,
-			RedirectAttributes redirectAttributes)
-	{
+	public String checkoutSuccess(@RequestParam("orderId") Long orderId, RedirectAttributes redirectAttributes) {
 		Order order = orderRepository.findById(orderId).orElse(null);
-		if(order != null)
-		{
+		if (order != null) {
 			order.setStatus(OrderStatus.PAID);
 			orderRepository.save(order);
-			redirectAttributes.addFlashAttribute("successMessage","Payment successful! The order with id: #" + orderId + " is confirmed.");
+			redirectAttributes.addFlashAttribute("successMessage",
+					"Payment successful! The order with id: #" + orderId + " is confirmed.");
 		}
 		return "redirect:/paintings";
 	}
-	
-	public String checkoutCancel(@RequestParam("orderId") Long orderId ,
-			RedirectAttributes redirectAttributes){
-				redirectAttributes.addFlashAttribute("cancelMessage","Payment was canceled for Order #" + orderId);
-				return "redirect:/paintings";
-			}
+
+	@GetMapping("/cancel")
+	public String checkoutCancel(@RequestParam("orderId") Long orderId, RedirectAttributes redirectAttributes) {
+		redirectAttributes.addFlashAttribute("cancelMessage", "Payment was canceled for Order #" + orderId);
+		return "redirect:/paintings";
+	}
 
 }

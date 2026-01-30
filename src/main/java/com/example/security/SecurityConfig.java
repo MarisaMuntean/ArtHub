@@ -20,8 +20,8 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
 		.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/register","/register/save","/login").permitAll()
-				.requestMatchers("/paintings","/paintings/find","/paintings/filter-advanced","/uploads/**","/styles.css","/checkout/**").authenticated()
+				.requestMatchers("/register","/register/save","/login","/styles.css").permitAll()
+				.requestMatchers("/paintings","/paintings/find","/paintings/filter-advanced","/uploads/**","/checkout/**").authenticated()
 				.requestMatchers("/paintings/add","/paintings/delete/**","/paintings/update").hasRole("EDITOR")
 				.anyRequest().authenticated()
 				)

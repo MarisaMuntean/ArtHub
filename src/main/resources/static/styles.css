@@ -17,10 +17,13 @@ tbody tr {
 
 /* Background for paintings.html */
 body.paintings-page {
-    min-height: 100vh; 
+    min-height: 100vh;
+    padding-top: 0.1px; 
+    
     background: radial-gradient(125% 125% at 50% 90%, #fff 40%, #475569 100%);
     background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed;
 }
 
 /* Background for checkout.html */
@@ -29,6 +32,7 @@ body.checkout-page {
     background: radial-gradient(125% 125% at 50% 10%, #fff 40%, #475569 100%);
     background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed;
 }
 
 .checkout-page .btn-turquoise {
@@ -41,3 +45,11 @@ body.checkout-page {
     color: #00ced1;              
 }
 
+/* Background for login.html */
+body.login-page {
+    min-height: 100vh;
+    background: radial-gradient(125% 125% at 50% 10%, #000000 40%, #00ced1 100%);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}

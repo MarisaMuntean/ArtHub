@@ -9,6 +9,8 @@ import com.stripe.Stripe;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 
+import jakarta.annotation.PostConstruct;
+
 @Service
 public class StripeService {
 
@@ -18,6 +20,7 @@ public class StripeService {
 	@Value("${app.base.url}")
 	private String baseUrl;
 	
+	@PostConstruct
 	public void init()
 	{
 		Stripe.apiKey = apiKey;

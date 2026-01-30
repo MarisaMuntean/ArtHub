@@ -24,10 +24,8 @@ public class User {
 
 	@Column(nullable = false)
 	private String role;
+	
+	@Column(nullable = false, unique = true)
+	private String email;
 
-	public User(String username, String password, String role) {
-		this.username = username;
-		this.password = password;
-		this.role = role;
-	}
 }

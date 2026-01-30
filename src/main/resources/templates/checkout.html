@@ -1,100 +1,135 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Checkout</title>
-<link href="https://bootswatch.com/5/sketchy/bootstrap.min.css"
-	rel="stylesheet">
-<link rel="stylesheet" th:href="@{/styles.css}" />
+    <title>Checkout</title>
+    <link href="https://bootswatch.com/5/sketchy/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/styles.css}" />
 </head>
 <body class="checkout-page">
-	<div class="container mt-5">
-		<div class="row">
-			<div class="col-md-5">
-				<h3 class="text-primary">Order Summary</h3>
-				<div class="card border-primary mb-3">
-					<div class="card-header" th:text="${painting.title}">Title</div>
-					<div class="card-body text-center">
-						<img th:if="${painting.imageUrl != null}"
-							th:src="${painting.imageUrl}"
-							style="max-width: 100%; height: 200px; object-fit: cover;"
-							class="mb-3">
-						<h5 class="card-title" th:text="'Artist: ' + ${painting.artist}"></h5>
-						<p class="card-text">
-							Price: <strong>$500</strong> (Example)
-						</p>
-					</div>
-				</div>
-			</div>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-5">
+            <h3 class="text-primary">Order Summary</h3>
+            <div class="card border-primary mb-3">
+                <div class="card-header" th:text="${painting.title}">Title</div>
+                <div class="card-body text-center">
+                    <img th:if="${painting.imageUrl != null}"
+                         th:src="${painting.imageUrl}"
+                         style="max-width: 100%; height: 200px; object-fit: cover;"
+                         class="mb-3">
+                    <h5 class="card-title" th:text="'Artist: ' + ${painting.artist}"></h5>
+                    <p class="card-text">
+                        Price: <strong th:text="${painting.price} + ' RON'"></strong>
+                    </p>
+                </div>
+            </div>
+        </div>
 
-			<div class="col-md-7">
-				<h3 class="turquoise">Shipping & Payment</h3>
+        <div class="col-md-7">
+            <h3 class="turquoise">Shipping & Payment</h3>
 
-				<div th:if="${cancelMessage}" class="alert alert-danger"
-					th:text="${cancelMessage}"></div>
+            <div th:if="${cancelMessage}" class="alert alert-danger">
+                <span th:text="${cancelMessage}"></span>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-dismissible alert-danger">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <span th:text="${errorMessage}"></span>
+            </div>
 
-				<form th:action="@{/checkout/process}" method="post"
-					th:object="${order}">
-					<input type="hidden" name="paintingId" th:value="${painting.id}">
+            <form th:action="@{/checkout/process}" method="post" th:object="${order}" onsubmit="prepareData()">
+                <input type="hidden" name="paintingId" th:value="${painting.id}">
 
-					<div class="mb-3">
-						<label class="form-label">Delivery Address</label>
-						<textarea class="form-control" th:field="*{address}" required
-							rows="2" placeholder="Street, City, Zip..."></textarea>
-					</div>
+                <h5 class="mb-3 mt-3">Delivery Address</h5>
+                
+                <div class="row mb-2">
+                    <div class="col-md-8">
+                        <label class="form-label small fw-bold">Street</label>
+                        <input type="text" id="inputStreet" class="form-control" placeholder="Street name" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Number</label>
+                        <input type="text" id="inputNumber" class="form-control" placeholder="No." required>
+                    </div>
+                </div>
 
-					<div class="mb-3">
-						<label class="form-label">Phone Number</label> <input type="text"
-							class="form-control" th:field="*{phoneNumber}" required
-							placeholder="07xx...">
-					</div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                         <label class="form-label small fw-bold">City</label>
+                         <input type="text" id="inputCity" class="form-control" placeholder="City" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Zip Code</label>
+                        <input type="text" id="inputZip" class="form-control" placeholder="Zip Code" required>
+                    </div>
+                </div>
 
-					<div class="mb-3">
-						<label class="form-label fw-bold">Payment Method</label>
-						<div class="form-check">
-							<input class="form-check-input" type="radio" name="paymentMethod"
-								id="payCash" value="CASH" checked
-								onclick="toggleCardInput(false)"> <label
-								class="form-check-label" for="payCash">Cash on Delivery
-							</label>
-						</div>
-						<div class="form-check">
-							<input class="form-check-input" type="radio" name="paymentMethod"
-								id="payCard" value="CARD" onclick="toggleCardInput(true)">
-							<label class="form-check-label" for="payCard">Pay with
-								Card</label>
-						</div>
-					</div>
+                <input type="hidden" th:field="*{address}" id="finalAddress">
 
-					<div id="cardDetails" style="display: none;"
-						class="card p-3 mb-3 bg-light">
-						<h6>Card Details</h6>
-						<div class="mb-2">
-							<input type="text" class="form-control" name="cardNumber"
-								placeholder="Card Number (16 digits)">
-						</div>
-						<div class="row">
-							<div class="col">
-								<input type="text" class="form-control" placeholder="MM/YY">
-							</div>
-							<div class="col">
-								<input type="text" class="form-control" placeholder="CVV">
-							</div>
-						</div>
-					</div>
 
-					<button type="submit" class="btn btn-lg w-100 btn-turquoise">Place
-						Order</button>
-					<a th:href="@{/paintings}" class="btn btn-link w-100 mt-2">Cancel</a>
-				</form>
-			</div>
-		</div>
-	</div>
+                <h5 class="mb-3">Contact Information</h5>
+                <label class="form-label small fw-bold">Phone Number</label>
+                <div class="input-group mb-3">
+                    <select class="form-select" style="max-width: 130px;" id="phonePrefix" required>
+                        <option value="" selected disabled>Prefix</option>
+                        <option value="+40">RO (+40)</option>
+                        <option value="+1">US (+1)</option>
+                        <option value="+44">UK (+44)</option>
+                        <option value="+49">DE (+49)</option>
+                        <option value="+33">FR (+33)</option>
+                        <option value="+39">IT (+39)</option>
+                        <option value="+34">ES (+34)</option>
+                    </select>
+                    <input type="text" class="form-control" id="phoneDigits" placeholder="xxx xxx xxx" required>
+                </div>
 
-	<script>
-		function toggleCardInput(show) {
-			document.getElementById('cardDetails').style.display = show ? 'block'
-					: 'none';
-			document.querySelector('input[name="cardNumber"]').required = show;
-		}
-	</script>
+                <input type="hidden" th:field="*{phoneNumber}" id="finalPhone">
+
+
+                <h5 class="mb-3">Payment Method</h5>
+                <div class="mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod"
+                               id="payCash" value="CASH" checked> 
+                        <label class="form-check-label" for="payCash">
+                            Cash on Delivery
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod"
+                               id="payCard" value="CARD">
+                        <label class="form-check-label" for="payCard">
+                            Pay with Card (Stripe Secure)
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-lg w-100 btn-turquoise">Place Order</button>
+                <a th:href="@{/paintings}" class="btn btn-link w-100 mt-2">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function prepareData() {
+        // 1. Combine Address Fields
+        var street = document.getElementById('inputStreet').value;
+        var number = document.getElementById('inputNumber').value;
+        var city = document.getElementById('inputCity').value;
+        var zip = document.getElementById('inputZip').value;
+
+        // Format: "Street Name, No. 12, City, Zip 123456"
+        var fullAddress = street + ", No. " + number + ", " + city + ", Zip " + zip;
+        document.getElementById('finalAddress').value = fullAddress;
+
+        // 2. Combine Phone Fields
+        var prefix = document.getElementById('phonePrefix').value;
+        var digits = document.getElementById('phoneDigits').value;
+
+        // Format: "+40744123456"
+        var fullPhone = prefix + digits; 
+        document.getElementById('finalPhone').value = fullPhone;
+    }
+</script>
+
 </body>
 </html>

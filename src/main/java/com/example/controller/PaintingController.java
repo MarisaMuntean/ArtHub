@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -75,7 +76,16 @@ public class PaintingController {
 		{
 			try {
 				String uploadDirectory = System.getProperty("user.dir") + "/uploads";
-				String fileName = imageFile.getOriginalFilename();
+				String fileName = StringUtils.cleanPath(imageFile.getOriginalFilename());
+				
+				if(fileName.contains("..")) {
+					throw new RuntimeException("Filename contains invalid path sequence " + fileName);
+				}
+				
+				if(!fileName.endsWith(".jpg") && !fileName.endsWith(".png") && !fileName.endsWith(".jpeg"))
+				{
+					redirectAttributes.addFlashAttribute("errorMessage","Only JPG/PNG/JPEG images are allowed.");
+				}
 				
 				Path uploadPath = Paths.get(uploadDirectory);
 				if(!Files.exists(uploadPath))
@@ -99,7 +109,7 @@ public class PaintingController {
 	return "redirect:/paintings";
 	}
 	
-	@GetMapping("/paintings/delete/{id}") 
+	@PostMapping("/paintings/delete/{id}") 
 	public String deletePainting(@PathVariable Long id, RedirectAttributes redirectAttributes) {
 	    Painting painting = service.findById(id);
 	    
