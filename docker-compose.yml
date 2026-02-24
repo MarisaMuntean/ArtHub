@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # Service for database
+  db:
+    image: mysql:8.0
+    container_name: arthub-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: bd_spring_jpa
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306" # Mapping to 3307 to avoid conflict with the installed MySQL
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # Service for Spring Boot App
+  app:
+    build: .
+    container_name: arthub-app-container
+    ports:
+      - "8081:8081" # Port from application.properties
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/bd_spring_jpa?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+    # - SPRING_DATASOURCE_PASSWORD=
+    # - STRIPE_API_KEY=
+    # - STRIPE_PUBLIC_KEY=
+    volumes:
+      - ./uploads:/app/uploads # Persistance of the uploaded images
+
+volumes:
+  mysql_data:
