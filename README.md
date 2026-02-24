@@ -55,6 +55,11 @@ To prevent **overselling** (Race Conditions) on unique art pieces:
 * **Stripe API:** Server-side integration creating secure `Session` objects.
 * **Webhook/Callback Handling:** Dedicated endpoints to handle success/cancel URLs, updating the `Order` entity status state-machine from `PENDING` to `PAID` automatically.
 
+### 6. Kubernetes Orchestration & Scaling
+* **High Availability:** The Spring Boot application is deployed across **2 replicas** to ensure load balancing and fault tolerance.
+* **Session Affinity (Sticky Sessions):** The K8s LoadBalancer Service uses `ClientIP` session affinity to route requests from the same user to the same pod, ensuring Spring Security login states persist correctly across multiple replicas.
+* **Secrets Management:** Sensitive data (Database passwords, Stripe API keys) are completely decoupled from the codebase using Kubernetes `Secrets` and dynamically injected as environment variables at runtime.
+
 ---
 
 ## Module Visualization
@@ -89,12 +94,12 @@ The domain model is normalized to 3NF and consists of the following core entitie
 
 ---
 
-## Deployment & Setup
+## Deployment & Setup with MySQL Workbench
 
 ### Prerequisites
 * JDK 17+
 * Maven 3.8+
-* MySQL Server 8.0+
+* MySQL Workbench 8.0+
 
 ### Environment Variables
 Configure `src/main/resources/application.properties`:
@@ -108,6 +113,36 @@ spring.datasource.password=YOUR_PASSWORD
 # Stripe API Configuration
 stripe.api.key=sk_test_...
 stripe.public.key=pk_test_...
+
+## Deployment & Setup with Kubernetes
+
+### Prerequisites
+* Docker Desktop (with Kubernetes enabled) or Minikube
+* `kubectl` CLI tool
+
+### 1. Configure Secrets
+Create a file named `sensitiveVariables.yaml` in the root directory:
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: arthub-secrets
+type: Opaque
+stringData:
+  mysql-database: "bd_spring_jpa"
+  mysql-root-password: "root"
+  stripe-api-key: "sk_test_your_secret_key"
+  stripe-public-key: "pk_test_your_public_key"
+
+### 2. Deploy to Cluster
+# 1. Apply secrets
+kubectl apply -f sensitiveVariables.yaml
+
+# 2. Deploy Database
+kubectl apply -f k8s/mysql.yaml
+
+# 3. Deploy Spring Boot Application
+kubectl apply -f k8s/app.yaml
 
 ### Security Audit Highlights
 
