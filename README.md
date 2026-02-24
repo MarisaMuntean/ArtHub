@@ -113,7 +113,7 @@ spring.datasource.password=YOUR_PASSWORD
 # Stripe API Configuration
 stripe.api.key=sk_test_...
 stripe.public.key=pk_test_...
-
+```
 ## Deployment & Setup with Kubernetes
 
 ### Prerequisites
@@ -133,16 +133,20 @@ stringData:
   mysql-root-password: "root"
   stripe-api-key: "sk_test_your_secret_key"
   stripe-public-key: "pk_test_your_public_key"
-
+```
 ### 2. Deploy to Cluster
 # 1. Apply secrets
+```
 kubectl apply -f sensitiveVariables.yaml
-
+```
 # 2. Deploy Database
+```
 kubectl apply -f k8s/mysql.yaml
-
+```
 # 3. Deploy Spring Boot Application
+```
 kubectl apply -f k8s/app.yaml
+```
 
 ### Security Audit Highlights
 
