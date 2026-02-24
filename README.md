@@ -134,21 +134,23 @@ stringData:
   stripe-api-key: "sk_test_your_secret_key"
   stripe-public-key: "pk_test_your_public_key"
 ```
-### 2. Deploy to Cluster
-# 1. Apply secrets
+
+## 2. Deploy to Cluster
+
+### 1. Apply secrets
 ```
 kubectl apply -f sensitiveVariables.yaml
 ```
-# 2. Deploy Database
+### 2. Deploy Database
 ```
 kubectl apply -f k8s/mysql.yaml
 ```
-# 3. Deploy Spring Boot Application
+### 3. Deploy Spring Boot Application
 ```
 kubectl apply -f k8s/app.yaml
 ```
 
-### Security Audit Highlights
+## Security Audit Highlights
 
 * **CSRF Protection:** Enabled for all state-changing HTTP verbs (`POST`, `PUT`, `DELETE`) to prevent unauthorized command execution.
 * **Path Traversal Prevention:** Implementation of `StringUtils.cleanPath()` during file uploads sanitizes filenames to prevent directory climbing attacks.
